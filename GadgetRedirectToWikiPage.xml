@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+  <ModulePrefs title="" height="0" scaling="false" />
+  <UserPref name="targetWikiPage" display_name="Target Wiki Page" datatype="string" required="true"/>
+  <Content type="html">
+  <![CDATA[
+    <!DOCTYPE html>
+    <html lang="en" dir="ltr">
+    <head>
+    <!-- If GoogleCode wiki allowed <meta>, then I'd have the main page
+         redirect that way, because then the redirect is cached by the browser.
+         However, this gadget is displayed in an iframe, and the following <meta>
+         only redirected the iframe. It means that <base> doesn't apply to <meta>.
+         I could have the <meta../> tag generated from within <script>...</script>.
+      <base target="_parent"/>
+      <meta http-equiv="refresh" content="0; url=https://code.google.com/p/selite/wiki/XXX"/>
+    -->
+    <script type="text/javascript">
+        function onLoad() {
+            //console.log( 'document.referrer: ' +document.referrer );
+            var textDiv= document.getElementById('text');
+            // If the referrer (i.e. the original Wiki page) had '?originalPage' at the end of its URL, then don't redirect (that enables users to star the project with Google). Otherwise redirect.
+            // Following works with both http:// and https://
+            // Internet Explorer 10 doesn't support string.endsWith(string). So I use indexOf().
+            if( !document.referrer || document.referrer.indexOf('?originalPage')<0 ) {
+                var prefs = new gadgets.Prefs();
+                var targetWikiPage= prefs.getString("targetWikiPage");
+                window.top.location.href= "https://code.google.com/p/selite/wiki/" +targetWikiPage;
+                textDiv.innerHTML= 'This page should redirect automatically and immediately. If it doesn\'t do so, please see <a href="https://code.google.com/p/selite/wiki/"' +targetWikiPage+ '>' +targetWikiPage+ '</a>.';
+            }
+        }
+    </script>
+    </head>
+    <body onload="onLoad();">
+        <div id="text"></div>
+    </body>
+    </html>
+  ]]>
+  </Content>
+</Module>
